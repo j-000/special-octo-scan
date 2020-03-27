@@ -103,26 +103,18 @@ class BasicCrawler(object):
         return False
 
 
-
-
-
 if __name__ == '__main__':
-    random_generated_file_name = ''.join(choices(
-        'abcdefghijklmnopqrstuvwxyz', k=7)) + '_data.csv'
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', help='URL to scan.', type=str, required=True)
     parser.add_argument('-md', help='Max downloads.', type=int, required=True)
     parser.add_argument('-far', help='Link follow accept rules. '
                                      'Use single quotes.', nargs='+',
                         required=True)
-    parser.add_argument('-fn', help='File name.', type=str,
-                        default=random_generated_file_name)
     args = parser.parse_args()
 
     bc = BasicCrawler(starting_url=args.u,
                       max_downloads=args.md,
                       follow_accept_rules=args.far)
     bc.run()
-    CrawlReporter(filename=args.fn, crawler=bc)
+    CrawlReporter(crawler=bc)
 

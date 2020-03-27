@@ -50,5 +50,14 @@ class CrawlReporter:
         self.write_to_file(worksheet=worksheet_1, data_array=info_headers,
                            row_style=bold)
 
+        data_headers = [['URL', 'Status Code']]
+        self.write_to_file(worksheet=worksheet_1, data_array=data_headers,
+                           custom=(0, 4), row_style=bold)
+
+        urls_col = [[url] for url in self.crawler.processed_urls]
+        self.write_to_file(worksheet=worksheet_1, data_array=urls_col,
+                           custom=(0, 5))
+
+
     def compile_report(self):
         pass
