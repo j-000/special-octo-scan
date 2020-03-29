@@ -19,11 +19,7 @@ class BasicCrawler:
         self.follow_accept_rules = follow_accept_rules
         self.new_urls = deque([self.starting_url])
         self.processed_urls = list()
-
-    def __str__(self):
-        return f'BasicCrawler(u={self.starting_url}, ' \
-               f'md={self.cap_downloads_at}, ' \
-               f'far={self.follow_accept_rules})'
+        self.run()
 
     def link_approved(self, anchor):
         result = all(
@@ -64,11 +60,11 @@ class BasicCrawler:
                             processed_link.increment_approved_links_count()
 
     def run(self):
-        pbar = tqdm.tqdm(total=self.cap_downloads_at)
+        progress_bar = tqdm.tqdm(total=self.cap_downloads_at)
         while len(self.new_urls) \
                 and len(self.processed_urls) < self.cap_downloads_at:
             # Update progress bar
-            pbar.update(1)
+            progress_bar.update(1)
             # Pop url from deque. URL has been normalized before being added
             url = self.new_urls.popleft()
             # Continue if url has been processed
@@ -81,7 +77,7 @@ class BasicCrawler:
             # Process new links on new processed_link page
             self.process_links_on_page(processed_link)
         # Close progress bar
-        pbar.close()
+        progress_bar.close()
 
     def create_link_processor(self, url):
         new_link = LinkProcessor(url)
@@ -90,19 +86,35 @@ class BasicCrawler:
 
 
 if __name__ == '__main__':
+    help_info = '''
+       _____                                          _  _____                 
+      / ____|                                        | |/ ____|                
+     | |     ___  _ __ ___  _ __ ___   __ _ _ __   __| | (___   ___ __ _ _ __  
+     | |    / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` |\___ \ / __/ _` | '_ \ 
+     | |___| (_) | | | | | | | | | | | (_| | | | | (_| |____) | (_| (_| | | | |
+      \_____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|_____/ \___\__,_|_| |_|                                
+    
+    [-h]     For help
+    [-u]     URL to scan
+    [-md]    Max downloads. Default 1000.
+    [-far]   Link follow accept rules. User singe quotes.
+    
+    Example:
+    ~:$ python crawler.py -u https://www.comandscan.com -md 5000 -far '(?si)https://www.commandscan.com.*'
+    ~:$ 100%|████████████████████████████████████████| 5000/5000 [05:00<05:00, 30954.27it/s]
+    '''
+    print(help_info)
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', help='URL to scan.',
-                        type=str, required=True)
-
-    parser.add_argument('-md', help='Max downloads. Default 1000',
-                        type=int, default=1000)
-
+    parser.add_argument('-u', help='URL to scan.', type=str, required=True)
+    parser.add_argument('-md', help='Max downloads. Default 1000', type=int,
+                        default=1000)
     parser.add_argument('-far', help='Link follow accept rules. '
                                      'Use single quotes.',
                         nargs='+', required=True)
     args = parser.parse_args()
-    bc = BasicCrawler(starting_url=args.u,
-                      max_downloads=args.md,
-                      follow_accept_rules=args.far)
-    bc.run()
+    bc = BasicCrawler(
+        starting_url=args.u,
+        max_downloads=args.md,
+        follow_accept_rules=args.far
+    )
     CrawlReporter(crawler=bc)
