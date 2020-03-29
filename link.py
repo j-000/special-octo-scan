@@ -13,7 +13,10 @@ class LinkProcessor:
         self.response = None
         self.metainfo = {
             'total_links_found_on_page': 0,
-            'total_links_approved': 0
+            'total_links_approved': 0,
+            'document_size': 0,
+            'headers': None,
+
         }
         self.exceptions = list()
         self.trawl()
