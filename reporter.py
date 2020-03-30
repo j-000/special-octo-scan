@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# @author Joao Oliveira github.com/j-000
+# @author Joao Oliveira https://github.com/j-000/special-octo-scan
 
 import datetime
 import random
@@ -38,29 +38,34 @@ class CrawlReporter:
             self.row += 1
 
     def set_filename(self):
-        filename = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=7))
-        filename += '_data.xlsx'
+        random_part = ''.join(
+            random.choices('abcdefghijklmnopqrstuvwxyz', k=7))
+        filename = f'octoscan_{random_part}_data.xlsx'
         return filename
 
     def write_file_info(self):
         bold = self.workbook.add_format({'bold': True})
         worksheet_1 = self.workbook.add_worksheet(name='Page Inventory')
         worksheet_1.hide_gridlines(2)
-        info_headers = [[f'Generated on {datetime.datetime.now()}']]
+        info_headers = [
+            [f'Generated on {datetime.date.today()} '
+             f'by OctoScan https://github.com/j-000/special-octo-scan']
+        ]
         self.write_to_file(worksheet=worksheet_1, data_array=info_headers,
                            row_style=bold)
 
         data_headers = [['URL',
                          'Status Code',
                          'Total links found on page',
-                         'Total links approved']]
+                         'Content-Type']]
         self.write_to_file(worksheet=worksheet_1, data_array=data_headers,
                            custom=(4, 0), row_style=bold)
 
         urls_col = [[link.url,
                      link.response.status_code,
                      link.metainfo.get('total_links_found_on_page', 'None'),
-                     link.metainfo.get('total_links_approved', 'None')]
+                     link.metainfo.get('headers', {}).get('content-type', 'None')]
                     for link in self.crawler.processed_urls]
+
         self.write_to_file(worksheet=worksheet_1, data_array=urls_col,
                            custom=(5, 0))

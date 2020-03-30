@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
-# @author Joao Oliveira github.com/j-000
+# @author Joao Oliveira https://github.com/j-000/special-octo-scan
 
 import unittest
-from collections import Counter
-
-import requests
 
 from crawler import BasicCrawler
-
 
 follow_accept_rules = [r'(?si)https://www\.sapo\.pt.*?']
 starting_url = 'https://www.sapo.pt'
@@ -31,51 +27,13 @@ class TestBasicCrawler(unittest.TestCase):
         self.assertEqual(len(self.crawler.new_urls), 1)
         self.assertEqual(len(self.crawler.processed_urls), 0)
 
-    def test_link_approved_method(self):
+    def test_href_approved_method(self):
         acceptable_link = 'https://www.sapo.pt/something'
         unacceptable_link = 'https://www.sapo-visao.pt/'
-        al_method_result = self.crawler.link_approved(acceptable_link)
-        ul_method_result = self.crawler.link_approved(unacceptable_link)
+        al_method_result = self.crawler.href_approved(acceptable_link)
+        ul_method_result = self.crawler.href_approved(unacceptable_link)
         self.assertTrue(al_method_result)
         self.assertFalse(ul_method_result)
-
-    def test_process_links_on_page_method(self):
-        html = '''<html>
-        <head></head>
-        <body>
-            <h1>Fake Page</h1>
-            <a href="https://www.sapo.pt/this-link-should-be-included">
-            Include me</a>
-            <a href="https://www.frog.pt/this-link-should-not-be-included">
-            Exclude me</a>            
-            <a href="">Exclude me coz I am empty</a>
-            <a>Exclude me coz href?</a>
-            <a href="https://www.sapo.pt/this-link-should-be-included">
-            Do not include me coz I am repeated</a>
-        </body>
-        </html>'''
-        self.crawler.process_links_on_page(html)
-        self.assertIn('https://www.sapo.pt/this-link-should-be-included',
-                      self.crawler.new_urls)
-        # Each url should not have duplicates
-        new_urls_counter = Counter(self.crawler.new_urls).values()
-        # Assert all urls have a max frequency of 1
-        self.assertTrue(
-            all([i == 1 for i in new_urls_counter])
-        )
-        self.assertNotIn(
-            'https://www.frog.pt/this-link-should-not-be-included',
-            self.crawler.new_urls)
-        self.assertNotIn('', self.crawler.new_urls)
-
-    def test_fetch_html_page_method(self):
-        valid_html_url = 'https://palletsprojects.com/p/flask/'
-        asset_url = 'https://palletsprojects.com/static/styles.css?h=8f5826ef'
-        html = self.crawler.fetch_html_page(valid_html_url)
-        expected_html = requests.get(valid_html_url).text
-        self.assertEqual(self.crawler.fetch_html_page(valid_html_url), expected_html)
-        response = self.crawler.fetch_html_page(asset_url)
-        self.assertFalse(response)
 
     def test_normalize_url_method(self):
         no_changes_url = 'https://www.sapo.pt'
@@ -108,8 +66,7 @@ class TestBasicCrawler(unittest.TestCase):
         self.crawler.run()
         # After the scan, processed_urls count should not be greater
         # than max_downloads + 1
-        self.assertLessEqual(
-            len(self.crawler.processed_urls), max_downloads)
+        self.assertLessEqual(len(self.crawler.processed_urls), max_downloads)
 
 
 if __name__ == '__main__':

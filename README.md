@@ -41,7 +41,7 @@ and OctoScan will write a report (.xslx) with all the assets it found and some m
 - [x] Basic website scanner.
 - [x] Basic report.
     - Asset inventory
-    - Asset metadata (HTTP status code, headers, size)
+    - Asset metadata
 - [x] Easy to use interface. 
 
 ### Future

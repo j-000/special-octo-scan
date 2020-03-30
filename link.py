@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# @author Joao Oliveira github.com/j-000
+# @author Joao Oliveira https://github.com/j-000/special-octo-scan
 
 import requests
 from bs4 import BeautifulSoup
@@ -13,16 +13,10 @@ class LinkProcessor:
         self.response = None
         self.metainfo = {
             'total_links_found_on_page': 0,
-            'total_links_approved': 0,
-            'document_size': 0,
             'headers': None,
-
         }
         self.exceptions = list()
         self.trawl()
-
-    def __str__(self):
-        return f'< Link(url={self.url}) >'
 
     def trawl(self):
         try:
@@ -30,14 +24,15 @@ class LinkProcessor:
             if 'text/html' not in self.response.headers['content-type']:
                 return
             self.html = self.response.text
+            self.metainfo.update({'headers': self.response.headers})
         except Exception as e:
             self.exceptions.append(e)
 
-    def find_all_links_on_page(self):
+    def get_all_hrefs_on_page(self):
         parse_html = BeautifulSoup(self.html, 'html.parser')
-        page_links = parse_html.find_all('a')
-        self.metainfo.update({'total_links_found_on_page': len(page_links)})
-        return page_links
-
-    def increment_approved_links_count(self):
-        self.metainfo['total_links_approved'] += 1
+        # Only links with an href attribute are considered
+        page_hrefs = [a.attrs.get('href')
+                      for a in parse_html.find_all('a')
+                      if 'href' in a.attrs]
+        self.metainfo.update({'total_links_found_on_page': len(page_hrefs)})
+        return page_hrefs

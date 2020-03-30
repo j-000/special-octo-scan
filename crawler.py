@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# @author Joao Oliveira github.com/j-000
+# @author Joao Oliveira https://github.com/j-000/special-octo-scan
 
 import re
 import argparse
@@ -18,10 +18,18 @@ class BasicCrawler:
         self.cap_downloads_at = max_downloads
         self.follow_accept_rules = follow_accept_rules
         self.new_urls = deque([self.starting_url])
-        self.processed_urls = list()
-        self.run()
 
-    def link_approved(self, anchor):
+        self._processed_links_set = set()
+        self.processed_urls = list()
+        # self.run()
+
+    def add_to_links_list(self, new_link_obj):
+        if new_link_obj.url in self._processed_links_set:
+            return
+        self.processed_urls.append(new_link_obj)
+        self._processed_links_set.add(new_link_obj.url)
+
+    def href_approved(self, anchor):
         result = all(
           [re.match(rule, anchor) for rule in self.follow_accept_rules]
         )
@@ -32,6 +40,8 @@ class BasicCrawler:
         if domain.endswith('/'):
             # remove trailing slash
             domain = domain[:-1]
+        if len(url) == 1:
+            return self.starting_url
         if url.startswith('//'):
             # remove one of the double slashes
             url = url[1:]
@@ -42,47 +52,41 @@ class BasicCrawler:
             return url[:-1]
         return url
 
-    def process_links_on_page(self, processed_link):
-        for link in processed_link.find_all_links_on_page():
-            # Only links with href are valid
-            if 'href' in link.attrs:
-                anchor = link.attrs['href']
-                # Only links that conform to
-                # follow accept rule are valid
-                normalized_anchor = self.normalize_url(anchor)
-                if self.link_approved(normalized_anchor):
-                    # Proceed if link has not been processed
-                    if normalized_anchor not in self.processed_urls:
-                        # Proceed if link is not already in the queue
-                        # to be processed
-                        if normalized_anchor not in self.new_urls:
-                            self.new_urls.append(normalized_anchor)
-                            processed_link.increment_approved_links_count()
-
     def run(self):
         progress_bar = tqdm.tqdm(total=self.cap_downloads_at)
         while len(self.new_urls) \
                 and len(self.processed_urls) < self.cap_downloads_at:
             # Update progress bar
             progress_bar.update(1)
-            # Pop url from deque. URL has been normalized before being added
+
+            # Pop href from deque. href has been normalized before being added
+            # also, href is assured not to have been processed before.
             url = self.new_urls.popleft()
-            # Continue if url has been processed
-            if url in self.processed_urls:
+
+            # Create processed link object
+            link_processor = LinkProcessor(url)
+
+            # Add link object to processed_urls list
+            self.add_to_links_list(link_processor)
+
+            # Skip if not valid content type
+            if not link_processor.html:
                 continue
-            processed_link = self.create_link_processor(url)
-            # Continue if not valid content type
-            if not processed_link.html:
-                continue
-            # Process new links on new processed_link page
-            self.process_links_on_page(processed_link)
+
+            # Loop all links href found on page
+            for href in link_processor.get_all_hrefs_on_page():
+                # Normalize href
+                normalized_href = self.normalize_url(href)
+                # Proceed if the href conforms to follow accept rules
+                if self.href_approved(normalized_href):
+                    # Proceed if href has not been processed
+                    if normalized_href not in self._processed_links_set:
+                        # Proceed if href is not already in the queue
+                        if normalized_href not in self.new_urls:
+                            # Add this new href to queue to be processed
+                            self.new_urls.append(normalized_href)
         # Close progress bar
         progress_bar.close()
-
-    def create_link_processor(self, url):
-        new_link = LinkProcessor(url)
-        self.processed_urls.append(new_link)
-        return new_link
 
 
 if __name__ == '__main__':
@@ -103,8 +107,10 @@ if __name__ == '__main__':
     Example:
     ~:$ python crawler.py -u https://www.comandscan.com -md 5000 -far '(?si)https://www.commandscan.com.*'
     ~:$ 100%|████████████████████████████████████████| 5000/5000 [05:00<05:00, 30954.27it/s]
+    
+    More info @ https://github.com/j-000/special-octo-scan
     '''
-    print(help_info)
+    print(help_info, '\n')
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', help='URL to scan.', type=str, required=True)
     parser.add_argument('-md', help='Max downloads. Default 1000', type=int,
@@ -118,4 +124,5 @@ if __name__ == '__main__':
         max_downloads=args.md,
         follow_accept_rules=args.far
     )
+    bc.run()
     CrawlReporter(crawler=bc)
