@@ -21,7 +21,7 @@ class BasicCrawler:
 
         self._processed_links_set = set()
         self.processed_urls = list()
-        # self.run()
+        self.run()
 
     def add_to_links_list(self, new_link_obj):
         if new_link_obj.url in self._processed_links_set:
@@ -91,23 +91,24 @@ class BasicCrawler:
 
 if __name__ == '__main__':
     help_info = '''
-    
      ██████╗  ██████╗████████╗ ██████╗     ███████╗ ██████╗ █████╗ ███╗   ██╗
     ██╔═══██╗██╔════╝╚══██╔══╝██╔═══██╗    ██╔════╝██╔════╝██╔══██╗████╗  ██║
     ██║   ██║██║        ██║   ██║   ██║    ███████╗██║     ███████║██╔██╗ ██║
     ██║   ██║██║        ██║   ██║   ██║    ╚════██║██║     ██╔══██║██║╚██╗██║
     ╚██████╔╝╚██████╗   ██║   ╚██████╔╝    ███████║╚██████╗██║  ██║██║ ╚████║
      ╚═════╝  ╚═════╝   ╚═╝    ╚═════╝     ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝
-                                                                                 
+
     [-h]     For help
     [-u]     URL to scan
     [-md]    Max downloads. Default 1000.
     [-far]   Link follow accept rules. Use single quotes.
-    
+
     Example:
-    ~:$ python crawler.py -u https://www.comandscan.com -md 5000 -far '(?si)https://www.commandscan.com.*'
-    ~:$ 100%|████████████████████████████████████████| 5000/5000 [05:00<05:00, 30954.27it/s]
-    
+    ~:$ python crawler.py -u https://www.comandscan.com -md 5000 -far \
+'(?si)https://www.commandscan.com.*'
+    ~:$ 100%|████████████████████████████████████████| 5000/5000 \
+[05:00<05:00, 30954.27it/s]
+
     More info @ https://github.com/j-000/special-octo-scan
     '''
     print(help_info, '\n')
@@ -124,5 +125,4 @@ if __name__ == '__main__':
         max_downloads=args.md,
         follow_accept_rules=args.far
     )
-    bc.run()
     CrawlReporter(crawler=bc)
