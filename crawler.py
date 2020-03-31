@@ -73,7 +73,7 @@ class BasicCrawler:
             if not link_processor.html:
                 continue
 
-            # Loop all links href found on page
+            # Loop all <a> href found on page
             for href in link_processor.get_all_hrefs_on_page():
                 # Normalize href
                 normalized_href = self.normalize_url(href)
@@ -85,6 +85,13 @@ class BasicCrawler:
                         if normalized_href not in self.new_urls:
                             # Add this new href to queue to be processed
                             self.new_urls.append(normalized_href)
+
+            # Loop all <link> tags
+
+            # Loop all <img> tags
+
+            # Loop all <script> tags
+
         # Close progress bar
         progress_bar.close()
 

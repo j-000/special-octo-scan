@@ -27,9 +27,8 @@ class CrawlReporter:
         self.main()
 
     def main(self):
-        self.write_file_info()
-        self.write_headers()
-        self.write_data()
+        self.write_worksheet_1()
+        self.write_worksheet_2()
         self.workbook.close()
 
     def write_to_file(self, data_array, worksheet, write_null=False,
@@ -57,7 +56,7 @@ class CrawlReporter:
             }
         )
 
-    def write_file_info(self):
+    def write_worksheet_1(self):
         self.add_worksheet('Page Inventory')
         worksheet_1 = self.worksheets.get('worksheet_1')
         worksheet_1.hide_gridlines(2)
@@ -68,8 +67,6 @@ class CrawlReporter:
         self.write_to_file(worksheet=worksheet_1, data_array=info_headers,
                            row_style=self.styles.get('bold'))
 
-    def write_headers(self):
-        worksheet_1 = self.worksheets.get('worksheet_1')
         data_headers = [['URL',
                          'Status Code',
                          'Total links found on page',
@@ -77,8 +74,6 @@ class CrawlReporter:
         self.write_to_file(worksheet=worksheet_1, data_array=data_headers,
                            custom=(4, 0), row_style=self.styles.get('bold'))
 
-    def write_data(self):
-        worksheet_1 = self.worksheets.get('worksheet_1')
         urls_col = [[link.url,
                      link.response.status_code,
                      link.metainfo.get('total_links_found_on_page', 'None'),
@@ -88,3 +83,7 @@ class CrawlReporter:
 
         self.write_to_file(worksheet=worksheet_1, data_array=urls_col,
                            custom=(5, 0))
+
+    def write_worksheet_2(self):
+        self.add_worksheet('Other Assets')
+        worksheet_2 = self.worksheets.get('worksheet_2')

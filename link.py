@@ -23,8 +23,6 @@ class LinkProcessor:
     def trawl(self):
         try:
             self.response = requests.get(self.url)
-            if 'text/html' not in self.response.headers['content-type']:
-                return
             self.html = self.response.text
             self.metainfo.update({'headers': self.response.headers})
         except Exception as e:
@@ -32,7 +30,7 @@ class LinkProcessor:
 
     def get_all_hrefs_on_page(self):
         parse_html = BeautifulSoup(self.html, 'html.parser')
-        # Only links with an href attribute are considered
+        # Only a tags with an href attribute are considered
         page_hrefs = [a.attrs.get('href')
                       for a in parse_html.find_all('a')
                       if 'href' in a.attrs]
@@ -51,7 +49,7 @@ class LinkProcessor:
         parse_html = BeautifulSoup(self.html, 'html.parser')
         script_tags = parse_html.find_all('script')
         self.metainfo.update({'script_tags_found': len(script_tags)})
-        valid_script_tags_hrefs = [script.attrs.get('src') for script
+        valid_script_tags_srcs = [script.attrs.get('src') for script
                                    in script_tags
                                    if script.has_attr('src')]
-        return valid_script_tags_hrefs
+        return valid_script_tags_srcs
