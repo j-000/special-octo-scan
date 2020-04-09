@@ -70,7 +70,8 @@ class CrawlReporter:
         data_headers = [['URL',
                          'Status Code',
                          'Total links found on page',
-                         'Content-Type']]
+                         'Content-Type',
+                         'Exceptions']]
         self.write_to_file(worksheet=worksheet_1, data_array=data_headers,
                            custom=(4, 0), row_style=self.styles.get('bold'))
 
@@ -78,7 +79,8 @@ class CrawlReporter:
                      link.response.status_code,
                      link.metainfo.get('total_links_found_on_page', 'None'),
                      link.metainfo.get('headers', {}).get(
-                         'content-type', 'None')]
+                         'content-type', 'None'),
+                     link.metainfo.get('exception', 'None')]
                     for link in self.crawler.processed_urls]
 
         self.write_to_file(worksheet=worksheet_1, data_array=urls_col,

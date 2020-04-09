@@ -42,9 +42,9 @@ class LinkProcessor:
             'total_links_found_on_page': 0,
             'headers': None,
             'link_tags_found': 0,
-            'script_tags_found': 0
+            'script_tags_found': 0,
+            'exception': None,
         }
-        self.exceptions = list()
         self.trawl()
 
     def trawl(self):
@@ -53,7 +53,7 @@ class LinkProcessor:
             self.html = self.response.text
             self.metainfo.update({'headers': self.response.headers})
         except Exception as e:
-            self.exceptions.append(e)
+            self.metainfo.update({'exception': e})
 
     def get_all_hrefs_on_page(self):
         parse_html = BeautifulSoup(self.html, 'html.parser')
