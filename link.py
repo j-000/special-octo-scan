@@ -53,6 +53,7 @@ class LinkProcessor:
             'script_tags_found': 0,
             'exception': None,
         }
+        self.rules_checks = dict()
         self.trawl()
 
     def trawl(self):
@@ -71,20 +72,3 @@ class LinkProcessor:
                       if 'href' in a.attrs]
         self.metainfo.update({'total_links_found_on_page': len(page_hrefs)})
         return page_hrefs
-
-    def get_all_links_on_page(self):
-        parse_html = BeautifulSoup(self.html, 'html.parser')
-        link_tags = parse_html.find_all('link')
-        self.metainfo.update({'link_tags_found': len(link_tags)})
-        valid_link_tags_hrefs = [link.attrs.get('href') for link in link_tags
-                                 if link.has_attr('href')]
-        return valid_link_tags_hrefs
-
-    def get_all_scripts_on_page(self):
-        parse_html = BeautifulSoup(self.html, 'html.parser')
-        script_tags = parse_html.find_all('script')
-        self.metainfo.update({'script_tags_found': len(script_tags)})
-        valid_script_tags_srcs = [script.attrs.get('src') for script
-                                   in script_tags
-                                   if script.has_attr('src')]
-        return valid_script_tags_srcs

@@ -9,6 +9,7 @@ import tqdm
 
 from reporter import CrawlReporter
 from link import LinkProcessor, LinkProcessorList
+from guideliner import Rule, Guideliner
 
 
 class BasicCrawler:
@@ -125,4 +126,10 @@ if __name__ == '__main__':
         max_downloads=args.md,
         follow_accept_rules=args.far
     )
-    CrawlReporter(crawler=bc)
+    
+    rule_1 = Rule('Page contains headings.', '(?si)<h[\d][^>]*>', 'A')
+    rule_2 = Rule('Page contains one <h1>.', '(?si)<h1[^>]*>', 'A')
+    
+    g = Guideliner(bc, rule_1, rule_2)
+    
+    CrawlReporter(crawler=bc, guideliner=g)

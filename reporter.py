@@ -16,9 +16,10 @@ def generate_random_filename():
 
 class CrawlReporter:
 
-    def __init__(self, crawler):
+    def __init__(self, crawler, guideliner):
         self.filename = generate_random_filename()
         self.crawler = crawler
+        self.guideliner = guideliner
         self.workbook = xlsxwriter.Workbook(filename=self.filename)
         self.worksheets = dict()
         self.styles = dict(bold=self.workbook.add_format({'bold': True}))
@@ -87,4 +88,19 @@ class CrawlReporter:
                            custom=(5, 0))
 
     def write_worksheet_2(self):
-        worksheet_2 = self.add_worksheet('Other Assets')
+        worksheet_2 = self.add_worksheet('Rules Checker')
+
+        rules_order = [rule.name for rule in self.guideliner.rules_list]
+
+        data_headers = [['URL']]
+        data_headers[0] += rules_order
+        self.write_to_file(data_headers, worksheet_2, 
+        row_style=self.styles.get('bold'), custom=(2, 0))
+
+        data_values = []
+        for lp in self.crawler.processed_urls:
+            linkvalues = [lp.url]
+            for rule in rules_order:
+                linkvalues.append(lp.rules_checks.get(rule))
+            data_values.append(linkvalues)
+        self.write_to_file(data_values, worksheet_2, custom=(3, 0))
