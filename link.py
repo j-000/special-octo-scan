@@ -11,10 +11,19 @@ class LinkProcessorList:
         self.processed_links_set = set()
         self.processed_urls = list()
 
+    def __iter__(self):
+        return self.processed_urls.__iter__()
+
     def __contains__(self, key):
-        if not isinstance(key, LinkProcessor):
-            raise ValueError('key must be type LinkProcessor')
-        return key.url in self.processed_links_set
+        if not isinstance(key, (str, LinkProcessor)):
+            raise ValueError(f'key must be type LinkProcessor or str - got {type(key)} -> {key}')
+        if isinstance(key, LinkProcessor):
+            return key.url in self.processed_links_set
+        if isinstance(key, str):
+            return key in self.processed_links_set
+
+    def __len__(self):
+        return len(self.processed_urls)
 
     def add(self, new_link_processor):
         if new_link_processor.url in self.processed_links_set:
