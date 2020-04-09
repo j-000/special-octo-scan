@@ -12,6 +12,14 @@ from link import LinkProcessor, LinkProcessorList
 
 
 class BasicCrawler:
+    """
+    BasicCrawler - only concerned with crawling a domain, depending on 
+    certain follow accept rules, and harvesting all <a> tags hrefs. 
+    Stops crawling either once the max cap is hit or all links have
+    been processed. Each href is normalised, converted into a 
+    <LinkProcessor> object and stored in the <LinkProcessorList> object.
+    Non-html content is harvested if conforming to the follow accept rules.
+    """
 
     def __init__(self, starting_url, max_downloads, follow_accept_rules):
         self.starting_url = starting_url
