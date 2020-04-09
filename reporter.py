@@ -95,7 +95,7 @@ class CrawlReporter:
              f'by OctoScan https://github.com/j-000/special-octo-scan']
         ]
         self.write_to_file(worksheet=worksheet_2, data_array=info_headers,
-                           row_style=self.styles.get('bold'))
+                           row_style=self.styles.get('bold'), custom=(0, 0))
 
         rules_order = [rule.name for rule in self.guideliner.rules_list]
 
