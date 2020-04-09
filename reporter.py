@@ -74,7 +74,7 @@ class CrawlReporter:
                          'Content-Type',
                          'Exceptions']]
         self.write_to_file(worksheet=worksheet_1, data_array=data_headers,
-                           custom=(4, 0), row_style=self.styles.get('bold'))
+                           custom=(3, 0), row_style=self.styles.get('bold'))
 
         urls_col = [[link.url,
                      link.response.status_code,
@@ -85,17 +85,23 @@ class CrawlReporter:
                     for link in self.crawler.processed_urls]
 
         self.write_to_file(worksheet=worksheet_1, data_array=urls_col,
-                           custom=(5, 0))
+                           custom=(4, 0))
 
     def write_worksheet_2(self):
         worksheet_2 = self.add_worksheet('Rules Checker')
+        worksheet_2.hide_gridlines(2)
+        info_headers = [
+            [f'Generated on {datetime.date.today()} '
+             f'by OctoScan https://github.com/j-000/special-octo-scan']
+        ]
+        self.write_to_file(worksheet=worksheet_2, data_array=info_headers,
+                           row_style=self.styles.get('bold'))
 
         rules_order = [rule.name for rule in self.guideliner.rules_list]
 
-        data_headers = [['URL']]
-        data_headers[0] += rules_order
+        data_headers = [['URL'] + rules_order]
         self.write_to_file(data_headers, worksheet_2, 
-        row_style=self.styles.get('bold'), custom=(2, 0))
+        row_style=self.styles.get('bold'), custom=(3, 0))
 
         data_values = []
         for lp in self.crawler.processed_urls:
@@ -103,4 +109,4 @@ class CrawlReporter:
             for rule in rules_order:
                 linkvalues.append(lp.rules_checks.get(rule))
             data_values.append(linkvalues)
-        self.write_to_file(data_values, worksheet_2, custom=(3, 0))
+        self.write_to_file(data_values, worksheet_2, custom=(4, 0))
