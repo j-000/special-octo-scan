@@ -49,16 +49,16 @@ class CrawlReporter:
 
     def add_worksheet(self, name):
         next_number = len(self.worksheets) + 1
+        new_worksheet = self.workbook.add_worksheet(name=name)
         self.worksheets.update(
             {
-                f'worksheet_{next_number}':
-                self.workbook.add_worksheet(name=name)
+                f'worksheet_{next_number}': new_worksheet
             }
         )
+        return new_worksheet
 
     def write_worksheet_1(self):
-        self.add_worksheet('Page Inventory')
-        worksheet_1 = self.worksheets.get('worksheet_1')
+        worksheet_1 = self.add_worksheet('Page Inventory')
         worksheet_1.hide_gridlines(2)
         info_headers = [
             [f'Generated on {datetime.date.today()} '
@@ -87,5 +87,4 @@ class CrawlReporter:
                            custom=(5, 0))
 
     def write_worksheet_2(self):
-        self.add_worksheet('Other Assets')
-        worksheet_2 = self.worksheets.get('worksheet_2')
+        worksheet_2 = self.add_worksheet('Other Assets')
