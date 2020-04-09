@@ -6,6 +6,9 @@ from bs4 import BeautifulSoup
 
 
 class LinkProcessorList:
+    """
+    LinkProcessorList - special list that holds <LinkProcessor> objects.
+    """
 
     def __init__(self):
         self.processed_links_set = set()
@@ -33,6 +36,11 @@ class LinkProcessorList:
         
 
 class LinkProcessor:
+    """
+    <LinkProcessor> - trawls one single page based on a given URL. 
+    Processes the response from the request and stores the html and 
+    response as properties. There is also some metainfo collected.
+    """
 
     def __init__(self, url):
         self.url = url
