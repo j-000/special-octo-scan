@@ -5,6 +5,24 @@ import requests
 from bs4 import BeautifulSoup
 
 
+class LinkProcessorList:
+
+    def __init__(self):
+        self.processed_links_set = set()
+        self.processed_urls = list()
+
+    def __contains__(self, key):
+        if not isinstance(key, LinkProcessor):
+            raise ValueError('key must be type LinkProcessor')
+        return key.url in self.processed_links_set
+
+    def add(self, new_link_processor):
+        if new_link_processor.url in self.processed_links_set:
+            return
+        self.processed_links_set.add(new_link_processor.url)
+        self.processed_urls.append(new_link_processor)
+        
+
 class LinkProcessor:
 
     def __init__(self, url):

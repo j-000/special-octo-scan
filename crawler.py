@@ -8,7 +8,7 @@ from collections import deque
 import tqdm
 
 from reporter import CrawlReporter
-from link import LinkProcessor
+from link import LinkProcessor, LinkProcessorList
 
 
 class BasicCrawler:
@@ -18,16 +18,8 @@ class BasicCrawler:
         self.cap_downloads_at = max_downloads
         self.follow_accept_rules = follow_accept_rules
         self.new_urls = deque([self.starting_url])
-
-        self._processed_links_set = set()
-        self.processed_urls = list()
+        self.processed_urls = LinkProcessorList()
         self.run()
-
-    def add_to_links_list(self, new_link_obj):
-        if new_link_obj.url in self._processed_links_set:
-            return
-        self.processed_urls.append(new_link_obj)
-        self._processed_links_set.add(new_link_obj.url)
 
     def href_approved(self, anchor):
         result = all(
@@ -67,7 +59,7 @@ class BasicCrawler:
             link_processor = LinkProcessor(url)
 
             # Add link object to processed_urls list
-            self.add_to_links_list(link_processor)
+            self.processed_urls.add(link_processor)
 
             # Skip if not valid content type
             if not link_processor.html:
@@ -80,18 +72,11 @@ class BasicCrawler:
                 # Proceed if the href conforms to follow accept rules
                 if self.href_approved(normalized_href):
                     # Proceed if href has not been processed
-                    if normalized_href not in self._processed_links_set:
+                    if normalized_href not in self.processed_urls:
                         # Proceed if href is not already in the queue
                         if normalized_href not in self.new_urls:
                             # Add this new href to queue to be processed
                             self.new_urls.append(normalized_href)
-
-            # Loop all <link> tags
-
-            # Loop all <img> tags
-
-            # Loop all <script> tags
-
         # Close progress bar
         progress_bar.close()
 
