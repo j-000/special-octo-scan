@@ -129,7 +129,8 @@ if __name__ == '__main__':
     
     rule_1 = Rule('Page contains headings.', '(?si)<h[\d][^>]*>', 'A')
     rule_2 = Rule('Page contains one <h1>.', '(?si)<h1[^>]*>', 'A')
+    rule_3 = Rule('Headings <h1> to <h3> contain less than 10 words.', '(?si)<(h[123])[^>]*>([^<]*)<\/\1>')
     
-    g = Guideliner(bc, rule_1, rule_2)
+    g = Guideliner(bc, rule_1, rule_2, rule_3)
     
     CrawlReporter(crawler=bc, guideliner=g)

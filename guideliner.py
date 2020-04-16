@@ -13,7 +13,8 @@ class Rule:
         B - use re.match - returns the first Match object if there is a match
         C - use re.search - find a match
     """
-    def __init__(self, name, regex, rtype):
+    def __init__(self, name, regex, rtype, customlogic=None):
+        self.logic = customlogic
         self.name = name
         if rtype not in 'ABC':
             raise ValueError(f'Expected rtype to be A, B OR C, got {rtype}.')
